@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import flask
+import json
 from flask.testing import FlaskClient
 
+RUN_WORKOUT_INPUT_STRING = 'run\n5\n3000\nFelt pretty good.'
 
 def test_get_index(app: flask.app.Flask, client: FlaskClient) -> None:
     res = client.get("/")
@@ -24,3 +26,10 @@ def test_get_index(app: flask.app.Flask, client: FlaskClient) -> None:
 def test_post_index(app: flask.app.Flask, client: FlaskClient) -> None:
     res = client.post("/")
     assert res.status_code == 405
+
+def test_add_workout(app: flask.app.Flask, client: FlaskClient) -> None:
+    res = client.post(
+        "/add-workout",
+        data=json.dumps({'input_string': RUN_WORKOUT_INPUT_STRING}),
+        content_type='application/json')
+    assert res.status_code == 200
