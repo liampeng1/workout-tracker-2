@@ -18,7 +18,7 @@ from objects.workout import Workout, Run
 import datetime
 from types import FrameType
 import json
-from flask import Flask, Request
+from flask import Flask, request
 from utils.logging import logger
 from google.cloud import firestore
 
@@ -37,13 +37,16 @@ def hello() -> str:
     return "Hello, World!"
 
 
-@app.route('/add-workout')
+@app.route('/add-workout', methods=['POST'])
 def add_workout():
-  workout_strings = Request.get_json()['input_string'].split('\n')
-  workout_type = workout_strings[0].lower()
+  data = request.json
+  logger.info('json', data)
+  input_string = data.get('input_string')
+  lines = input_string.split('\n')
+  workout_type = lines[0].lower()
   if 'run' in workout_type:
-    run = build_run(workout_strings)
-    add_workout(run)
+    run = build_run(lines)
+    add_workout_to_db(run)
     d = run.to_dict()
     d['date_time'] = str(d['date_time'])
     return json.dumps(d)
@@ -52,9 +55,9 @@ def add_workout():
 
 def build_run(workout_strings):
   run_dist, run_duration, notes = float(workout_strings[1]), int(workout_strings[2]), workout_strings[3]
-  return Run(datetime.now(), '\n'.join(workout_strings), notes, run_dist, run_duration)
+  return Run(datetime.datetime.now(), '\n'.join(workout_strings), notes, run_dist, run_duration)
 
-def add_workout(workout: Workout):
+def add_workout_to_db(workout: Workout):
   doc_name = str(workout.date_time)
   db.collection('workouts').document(doc_name).set(workout.to_dict())
 

@@ -15,13 +15,15 @@ class Workout:
 
   def to_dict(self):
     return {
-      'workout_type': str(type(self)),
+      'workout_type': self.type_name,
       'date_time': self.date_time,
       'input_string': self.input_string,
       'notes': self.notes
     }
 
 class Run(Workout):
+
+  type_name = 'RUN'
 
   def __init__(self, date_time: datetime, input_string: str, notes: str, distance_mi: float, duration_sec: int) -> None:
       super().__init__(date_time, input_string, notes)
@@ -39,6 +41,8 @@ class Run(Workout):
     return d
 
 class Lift:
+
+  type_name = 'LIFT'
 
   def __init__(self, lift_name: str, sets: List[int]) -> None:
     self.lift_name = lift_name
