@@ -1,7 +1,6 @@
 
 from datetime import datetime
 from typing import List
-import json
 
 class Workout:
 
@@ -29,7 +28,12 @@ class Workout:
     }
   
   def __str__(self):
-    return f'{self.type_name} at {str(self.date_time)}'
+    date_str = self.date_time.strftime("%Y-%m-%d")
+    time_str = self.date_time.strftime("%H:%M")
+    return f'{self.type_name} on {date_str} at {time_str}'
+  
+  def _get_notes_str_(self):
+    return f'Notes: {self.notes}'
 
 class Run(Workout):
 
@@ -55,6 +59,7 @@ class Run(Workout):
     return f'''{super().__str__()}
     Distance: {self.distance_mi} mi
     Duration: {dur_min}:{dur_sec}
+    {super()._get_notes_str_()}
     '''
 
 class Lift:
@@ -102,4 +107,5 @@ class Gym(Workout):
     lifts_str = '\n'.join([str(lift) for lift in self.lifts])
     return f'''{super().__str__()}
     {lifts_str}
+    {super()._get_notes_str_()}
     '''

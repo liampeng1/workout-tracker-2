@@ -81,8 +81,7 @@ def get_workouts():
   for doc in docs:
     workout = Workout.from_dict(doc.to_dict())
     workouts.append(str(workout))
-  seperator = '\n\n'
-  return seperator.join(workouts)
+  return '\n'.join(workouts)
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:
     logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
