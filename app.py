@@ -59,7 +59,7 @@ def build_run(workout_strings):
   return Run(datetime.datetime.now(), '\n'.join(workout_strings), notes, run_dist, run_duration)
 
 def build_gym(workout_strings):
-  notes, lifts_input = workout_strings[-1], workout_strings[:-1]
+  notes, lifts_input = workout_strings[-1], workout_strings[1:-1]
   lifts = []
   for lift_input in lifts_input:
     words = lift_input.split(' ')
