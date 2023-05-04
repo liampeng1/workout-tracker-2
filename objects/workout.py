@@ -1,6 +1,7 @@
 
 from datetime import datetime
 from typing import List
+import json
 
 class Workout:
 
@@ -11,7 +12,13 @@ class Workout:
 
   @staticmethod
   def from_dict(source: dict):
-    return Workout(source['date_time'], source['input_string'], source['notes'])
+    workout_type = source['workout_type']
+    if workout_type == Run.type_name:
+      return Run.from_dict(source)
+    elif workout_type == Lift.type_name:
+      return Lift.from_dict(source)
+    else:
+      raise Exception(f'Workout Type: {workout_type} not supported')
 
   def to_dict(self):
     return {
@@ -20,6 +27,9 @@ class Workout:
       'input_string': self.input_string,
       'notes': self.notes
     }
+  
+  def __str__(self):
+    return f'{self.type_name} at {str(self.date_time)}'
 
 class Run(Workout):
 
@@ -39,10 +49,15 @@ class Run(Workout):
     d['distance_mi'] = self.distance_mi
     d['duration_sec'] = self.duration_sec
     return d
+  
+  def __str__(self) -> str:
+    dur_min, dur_sec = self.duration_sec // 60, self.duration_sec % 60
+    return f'''{super().__str__()}
+    Distance: {self.distance_mi} mi
+    Duration: {dur_min}:{dur_sec}
+    '''
 
 class Lift:
-
-  type_name = 'LIFT'
 
   def __init__(self, lift_name: str, sets: List[int]) -> None:
     self.lift_name = lift_name
@@ -58,7 +73,13 @@ class Lift:
       'sets': self.sets
     }
 
+  def __str__(self):
+    sets_str = ', '.join(self.sets)
+    return f'{self.lift_name}: {sets_str}'
+
 class Gym(Workout):
+
+  type_name = 'GYM'
 
   def __init__(self, date_time: datetime, input_string: str, notes: str, lifts: List[Lift]) -> None:
     super().__init__(date_time, input_string, notes)
@@ -75,3 +96,8 @@ class Gym(Workout):
     d['duration_sec'] = self.duration_sec
     return d
   
+  def __str__(self) -> str:
+    lifts_str = '\n'.join([str(lift) for lift in self.lifts])
+    return f'''{super().__str__()}
+    {lifts_str}
+    '''

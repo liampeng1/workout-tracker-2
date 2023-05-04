@@ -17,7 +17,6 @@ import sys
 from objects.workout import Workout, Run
 import datetime
 from types import FrameType
-import json
 from flask import Flask, request
 from utils.logging import logger
 from google.cloud import firestore
@@ -47,9 +46,7 @@ def add_workout():
   if 'run' in workout_type:
     run = build_run(lines)
     add_workout_to_db(run)
-    d = run.to_dict()
-    d['date_time'] = str(d['date_time'])
-    return json.dumps(d)
+    return str(run)
   else:
     return f'Workout type: {workout_type} is not supported.'
 
@@ -60,6 +57,17 @@ def build_run(workout_strings):
 def add_workout_to_db(workout: Workout):
   doc_name = str(workout.date_time)
   db.collection('workouts').document(doc_name).set(workout.to_dict())
+
+@app.route('/get-workouts')
+def get_workouts():
+  query = db.collection('workouts').order_by('date_time', direction=firestore.Query.DESCENDING).limit(10)
+  docs = query.stream()
+  workouts = []
+  for doc in docs:
+    workout = Workout.from_dict(doc.to_dict())
+    workouts.append(str(workout))
+  seperator = '\n\n'
+  return seperator.join(workouts)
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:
     logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
