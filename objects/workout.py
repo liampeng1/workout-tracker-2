@@ -15,8 +15,8 @@ class Workout:
     workout_type = source['workout_type']
     if workout_type == Run.type_name:
       return Run.from_dict(source)
-    elif workout_type == Lift.type_name:
-      return Lift.from_dict(source)
+    elif workout_type == Gym.type_name:
+      return Gym.from_dict(source)
     else:
       raise Exception(f'Workout Type: {workout_type} not supported')
 
@@ -74,7 +74,7 @@ class Lift:
     }
 
   def __str__(self):
-    sets_str = ', '.join(self.sets)
+    sets_str = ', '.join([str(reps) for reps in self.sets])
     return f'{self.lift_name}: {sets_str}'
 
 class Gym(Workout):
@@ -87,13 +87,15 @@ class Gym(Workout):
 
   @staticmethod
   def from_dict(source: dict):
-    lifts = [Lift(lift_source) for lift_source in source['lifts']]
+    lifts = []
+    for lift_source in source['lifts']:
+      lifts.append(Lift.from_dict(lift_source))
     return Gym(source['date_time'], source['input_string'], source['notes'], lifts)
 
   def to_dict(self):
     d = super().to_dict()
-    d['distance_mi'] = self.distance_mi
-    d['duration_sec'] = self.duration_sec
+    lift_dicts = [lift.to_dict() for lift in self.lifts]
+    d['lifts'] = lift_dicts
     return d
   
   def __str__(self) -> str:

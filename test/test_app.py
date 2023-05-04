@@ -16,7 +16,15 @@ import flask
 import json
 from flask.testing import FlaskClient
 
-RUN_WORKOUT_INPUT_STRING = 'run\n5\n3000\nFelt pretty good.'
+RUN_WORKOUT_INPUT_STRING = '''run
+5
+3000
+Felt pretty good.'''
+
+GYM_WORKOUT_INPUT_STRING = '''gym
+squat 5 5 5 5
+bench 6 8 10 8 6
+Tough workout. Really sore.'''
 
 def test_get_index(app: flask.app.Flask, client: FlaskClient) -> None:
     res = client.get("/")
@@ -26,10 +34,17 @@ def test_post_index(app: flask.app.Flask, client: FlaskClient) -> None:
     res = client.post("/")
     assert res.status_code == 405
 
-def test_add_workout(app: flask.app.Flask, client: FlaskClient) -> None:
+def test_add_workout_run(app: flask.app.Flask, client: FlaskClient) -> None:
     res = client.post(
         "/add-workout",
         data=json.dumps({'input_string': RUN_WORKOUT_INPUT_STRING}),
+        content_type='application/json')
+    assert res.status_code == 200
+
+def test_add_workout_gym(app: flask.app.Flask, client: FlaskClient) -> None:
+    res = client.post(
+        "/add-workout",
+        data=json.dumps({'input_string': GYM_WORKOUT_INPUT_STRING}),
         content_type='application/json')
     assert res.status_code == 200
 
